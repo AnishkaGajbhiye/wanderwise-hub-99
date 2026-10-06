@@ -125,7 +125,7 @@ export function RecordForm({
                 >
                   {labels[f] || f}
                   {parent ? (
-                    <select name={f} defaultValue={String(row?.[f] ?? "")} required={!optional}>
+                    <select aria-label={labels[f] || f} name={f} defaultValue={String(row?.[f] ?? "")} required={!optional}>
                       <option value="">{optional ? "None" : "Select " + labels[f]}</option>
                       {db[parent].map((r) => (
                         <option key={String(r[ids[parent]])} value={String(r[ids[parent]])}>
@@ -135,7 +135,7 @@ export function RecordForm({
                       ))}
                     </select>
                   ) : options ? (
-                    <select name={f} defaultValue={String(row?.[f] ?? options[0])}>
+                    <select aria-label={labels[f] || f} name={f} defaultValue={String(row?.[f] ?? options[0])}>
                       {options.map((o) => (
                         <option key={o}>{o}</option>
                       ))}
