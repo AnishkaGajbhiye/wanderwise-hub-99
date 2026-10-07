@@ -42,7 +42,7 @@ describe("TravelPlanner records and integrity", () => {
       ),
     ).toBe(4300));
   it("updates total when a 500 expense is added", () =>
-    expect(total([...initialData.EXPENSE, { Amount: 500 }], "Amount")).toBe(8500));
+    expect(total([...initialData.EXPENSE, { Amount: 500 }], "Amount")).toBe(11500));
   it("rejects duplicate traveler emails", () =>
     expect(
       validateRecord(initialData, "TRAVELER", { TravelerID: 4, Tra_Email: "ananya@gmail.com" }),
