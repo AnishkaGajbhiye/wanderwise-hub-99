@@ -444,6 +444,87 @@ export function TripsPage() {
     </>
   );
 }
+export function PastTripsPage() {
+  const { db, user, search } = useTravel();
+  // Past trips of the logged-in traveler only. Later this becomes:
+  // SELECT * FROM TRIP WHERE TravelerID = ? AND EndDate < CURDATE()
+  const today = new Date().toISOString().slice(0, 10);
+  const trips = db.TRIP.filter(
+    (t) =>
+      t["TravelerID"] === user["TravelerID"] &&
+      String(t["EndDate"]) < today &&
+      JSON.stringify(t).toLowerCase().includes(search.toLowerCase()),
+  );
+  return (
+    <>
+      <PageHeading
+        eyebrow="TRIP → TRAVELER"
+        title="Past Trips"
+        description="Completed adventures from your travel history."
+      />
+      <div className="filter-toolbar">
+        <div>
+          <h2>Completed trips</h2>
+        </div>
+        <span>{trips.length} trips</span>
+      </div>
+      <div className="trip-grid">
+        {trips.map((t) => {
+          const media = tripMedia[Number(t["TripID"])];
+          const expenses = total(
+            db.EXPENSE.filter((e) => e["TripID"] === t["TripID"]),
+            "Amount",
+          );
+          return (
+            <article className="trip-card" key={String(t["TripID"])}>
+              <Link
+                to="/trips/$tripId"
+                params={{ tripId: String(t["TripID"]) }}
+                className="trip-image"
+              >
+                <img
+                  src={media?.image || goa}
+                  alt={media?.city || String(t["Title"])}
+                  width={1200}
+                  height={800}
+                />
+                <Badge>Completed</Badge>
+                <span className="photo-tag">{media?.tag || "Past adventure"}</span>
+              </Link>
+              <div className="trip-card-body">
+                <div className="trip-title">
+                  <Link to="/trips/$tripId" params={{ tripId: String(t["TripID"]) }}>
+                    <h3>{String(t["Title"])}</h3>
+                  </Link>
+                </div>
+                <p className="trip-dates">
+                  <CalendarDays size={15} />
+                  {date(t["StartDate"])} – {date(t["EndDate"])}
+                </p>
+                <div className="trip-card-footer">
+                  <div>
+                    <small>Trip budget</small>
+                    <strong>{money(t["Budget"])}</strong>
+                  </div>
+                  <div>
+                    <small>Total expenses</small>
+                    <strong>{money(expenses)}</strong>
+                  </div>
+                </div>
+                <Button variant="outline" size="sm" asChild>
+                  <Link to="/trips/$tripId" params={{ tripId: String(t["TripID"]) }}>
+                    View Trip Summary <ArrowUpRight />
+                  </Link>
+                </Button>
+              </div>
+            </article>
+          );
+        })}
+      </div>
+      {!trips.length && <Empty />}
+    </>
+  );
+}
 export function ItineraryPage() {
   const { db, search } = useTravel();
   const [form, setForm] = useState<Row | null | undefined>();
