@@ -1,16 +1,29 @@
 import { describe, it, expect } from "vitest";
 import { initialData, total, validateRecord, deleteBlocker } from "@/lib/travel-data";
 describe("TravelPlanner records and integrity", () => {
-  it("has three trips and a 95000 budget", () => {
-    expect(initialData.TRIP).toHaveLength(3);
-    expect(total(initialData.TRIP, "Budget")).toBe(95000);
+  it("has four trips and a 117000 budget", () => {
+    expect(initialData.TRIP).toHaveLength(4);
+    expect(total(initialData.TRIP, "Budget")).toBe(117000);
   });
   it("has three sample bookings", () => {
     expect(initialData.BOOKING).toHaveLength(3);
   });
-  it("totals expenses to 8000", () => expect(total(initialData.EXPENSE, "Amount")).toBe(8000));
+  it("shows only booking 501 for logged-in traveler 1", () => {
+    const mine = initialData.BOOKING.filter((b) => b["TravelerID"] === 1);
+    expect(mine).toHaveLength(1);
+    expect(mine[0]?.["BookingID"]).toBe(501);
+  });
+  it("shows only trip 104 as a past trip for traveler 1", () => {
+    const today = new Date().toISOString().slice(0, 10);
+    const past = initialData.TRIP.filter(
+      (t) => t["TravelerID"] === 1 && String(t["EndDate"]) < today,
+    );
+    expect(past).toHaveLength(1);
+    expect(past[0]?.["TripID"]).toBe(104);
+  });
+  it("totals expenses to 11000", () => expect(total(initialData.EXPENSE, "Amount")).toBe(11000));
   it.each([
-    [701, 4700],
+    [701, 7700],
     [702, 1800],
     [703, 1500],
   ])("totals category %i to %i", (id, amount) =>

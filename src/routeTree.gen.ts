@@ -16,6 +16,7 @@ import { Route as DestinationsRouteImport } from './routes/destinations'
 import { Route as ExpensesRouteImport } from './routes/expenses'
 import { Route as ItineraryRouteImport } from './routes/itinerary'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as PastTripsRouteImport } from './routes/past-trips'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as TransportRouteImport } from './routes/transport'
 import { Route as TripsRouteImport } from './routes/trips'
@@ -57,6 +58,11 @@ const LoginRoute = LoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PastTripsRoute = PastTripsRouteImport.update({
+  id: '/past-trips',
+  path: '/past-trips',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProfileRoute = ProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
@@ -91,6 +97,7 @@ export interface FileRoutesByFullPath {
   '/expenses': typeof ExpensesRoute
   '/itinerary': typeof ItineraryRoute
   '/login': typeof LoginRoute
+  '/past-trips': typeof PastTripsRoute
   '/profile': typeof ProfileRoute
   '/transport': typeof TransportRoute
   '/trips': typeof TripsRouteWithChildren
@@ -105,6 +112,7 @@ export interface FileRoutesByTo {
   '/expenses': typeof ExpensesRoute
   '/itinerary': typeof ItineraryRoute
   '/login': typeof LoginRoute
+  '/past-trips': typeof PastTripsRoute
   '/profile': typeof ProfileRoute
   '/transport': typeof TransportRoute
   '/trips/$tripId': typeof TripsTripIdRoute
@@ -119,6 +127,7 @@ export interface FileRoutesById {
   '/expenses': typeof ExpensesRoute
   '/itinerary': typeof ItineraryRoute
   '/login': typeof LoginRoute
+  '/past-trips': typeof PastTripsRoute
   '/profile': typeof ProfileRoute
   '/transport': typeof TransportRoute
   '/trips': typeof TripsRouteWithChildren
@@ -135,6 +144,7 @@ export interface FileRouteTypes {
     | '/expenses'
     | '/itinerary'
     | '/login'
+    | '/past-trips'
     | '/profile'
     | '/transport'
     | '/trips'
@@ -149,6 +159,7 @@ export interface FileRouteTypes {
     | '/expenses'
     | '/itinerary'
     | '/login'
+    | '/past-trips'
     | '/profile'
     | '/transport'
     | '/trips/$tripId'
@@ -162,6 +173,7 @@ export interface FileRouteTypes {
     | '/expenses'
     | '/itinerary'
     | '/login'
+    | '/past-trips'
     | '/profile'
     | '/transport'
     | '/trips'
@@ -177,6 +189,7 @@ export interface RootRouteChildren {
   ExpensesRoute: typeof ExpensesRoute
   ItineraryRoute: typeof ItineraryRoute
   LoginRoute: typeof LoginRoute
+  PastTripsRoute: typeof PastTripsRoute
   ProfileRoute: typeof ProfileRoute
   TransportRoute: typeof TransportRoute
   TripsRoute: typeof TripsRouteWithChildren
@@ -231,6 +244,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/past-trips': {
+      id: '/past-trips'
+      path: '/past-trips'
+      fullPath: '/past-trips'
+      preLoaderRoute: typeof PastTripsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/profile': {
@@ -291,6 +311,7 @@ const rootRouteChildren: RootRouteChildren = {
   ExpensesRoute: ExpensesRoute,
   ItineraryRoute: ItineraryRoute,
   LoginRoute: LoginRoute,
+  PastTripsRoute: PastTripsRoute,
   ProfileRoute: ProfileRoute,
   TransportRoute: TransportRoute,
   TripsRoute: TripsRouteWithChildren,
