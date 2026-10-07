@@ -809,7 +809,7 @@ export function ManagementPage({ entity }: { entity: Entity }) {
         action={
           <Button
             onClick={() =>
-              setForm(entity === "BOOKING" ? { TravelerID: user["TravelerID"] } : null)
+              setForm(entity === "BOOKING" ? { TravelerID: Number(user["TravelerID"]) } : null)
             }
           >
             <Plus />
