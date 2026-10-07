@@ -632,14 +632,20 @@ const columnLabels: Record<string, string> = {
   AccommodationID2: "ID",
 };
 export function ManagementPage({ entity }: { entity: Entity }) {
-  const { db, search } = useTravel();
+  const { db, search, user } = useTravel();
   const [form, setForm] = useState<Row | null | undefined>();
   const [filter, setFilter] = useState("all");
   const [categoryForm, setCategoryForm] = useState<Row | null | undefined>();
   const [receipt, setReceipt] = useState<Row | null>(null);
   const config = headings[entity];
-  const cols = [ids[entity], ...fields[entity]];
+  // Bookings belong to the logged-in traveler only; the Traveler column is
+  // hidden because the traveler already knows who they are. Replace this
+  // filter with an API call scoped by the authenticated TravelerID later.
+  const cols = [ids[entity], ...fields[entity]].filter(
+    (c) => !(entity === "BOOKING" && c === "TravelerID"),
+  );
   const rows = db[entity].filter((r) => {
+    if (entity === "BOOKING" && r["TravelerID"] !== user["TravelerID"]) return false;
     let text = JSON.stringify(r);
     if (r["TripID"]) text += db.TRIP.find((t) => t["TripID"] === r["TripID"])?.["Title"];
     if (r["TravelerID"])
@@ -816,7 +822,11 @@ export function ManagementPage({ entity }: { entity: Entity }) {
         {!rows.length && <Empty />}
         <div className="table-bottom">
           <span>
-            {rows.length} of {db[entity].length} records
+            {rows.length} of{" "}
+            {entity === "BOOKING"
+              ? db.BOOKING.filter((b) => b["TravelerID"] === user["TravelerID"]).length
+              : db[entity].length}{" "}
+            records
           </span>
           <span>
             <Database size={14} />
