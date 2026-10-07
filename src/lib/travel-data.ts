@@ -76,6 +76,15 @@ export const initialData: Database = {
       Budget: 25000,
       Description: "Exploring historical places",
     },
+    {
+      TripID: 104,
+      TravelerID: 1,
+      Title: "Kerala Getaway",
+      StartDate: "2026-02-10",
+      EndDate: "2026-02-15",
+      Budget: 22000,
+      Description: "Backwaters and hill stations",
+    },
   ],
   DESTINATION: [
     {
@@ -243,6 +252,15 @@ export const initialData: Database = {
       Date: "2026-11-02",
       ExpenseType: "Shopping",
       ReceiptURL: "receipt004.com",
+    },
+    {
+      ExpenseID: 805,
+      TripID: 104,
+      CategoryID: 701,
+      Amount: 3000,
+      Date: "2026-02-12",
+      ExpenseType: "Food",
+      ReceiptURL: "receipt005.com",
     },
   ],
 };

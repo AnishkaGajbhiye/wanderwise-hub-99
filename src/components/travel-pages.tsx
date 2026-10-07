@@ -444,6 +444,87 @@ export function TripsPage() {
     </>
   );
 }
+export function PastTripsPage() {
+  const { db, user, search } = useTravel();
+  // Past trips of the logged-in traveler only. Later this becomes:
+  // SELECT * FROM TRIP WHERE TravelerID = ? AND EndDate < CURDATE()
+  const today = new Date().toISOString().slice(0, 10);
+  const trips = db.TRIP.filter(
+    (t) =>
+      t["TravelerID"] === user["TravelerID"] &&
+      String(t["EndDate"]) < today &&
+      JSON.stringify(t).toLowerCase().includes(search.toLowerCase()),
+  );
+  return (
+    <>
+      <PageHeading
+        eyebrow="TRIP → TRAVELER"
+        title="Past Trips"
+        description="Completed adventures from your travel history."
+      />
+      <div className="filter-toolbar">
+        <div>
+          <h2>Completed trips</h2>
+        </div>
+        <span>{trips.length} trips</span>
+      </div>
+      <div className="trip-grid">
+        {trips.map((t) => {
+          const media = tripMedia[Number(t["TripID"])];
+          const expenses = total(
+            db.EXPENSE.filter((e) => e["TripID"] === t["TripID"]),
+            "Amount",
+          );
+          return (
+            <article className="trip-card" key={String(t["TripID"])}>
+              <Link
+                to="/trips/$tripId"
+                params={{ tripId: String(t["TripID"]) }}
+                className="trip-image"
+              >
+                <img
+                  src={media?.image || goa}
+                  alt={media?.city || String(t["Title"])}
+                  width={1200}
+                  height={800}
+                />
+                <Badge>Completed</Badge>
+                <span className="photo-tag">{media?.tag || "Past adventure"}</span>
+              </Link>
+              <div className="trip-card-body">
+                <div className="trip-title">
+                  <Link to="/trips/$tripId" params={{ tripId: String(t["TripID"]) }}>
+                    <h3>{String(t["Title"])}</h3>
+                  </Link>
+                </div>
+                <p className="trip-dates">
+                  <CalendarDays size={15} />
+                  {date(t["StartDate"])} – {date(t["EndDate"])}
+                </p>
+                <div className="trip-card-footer">
+                  <div>
+                    <small>Trip budget</small>
+                    <strong>{money(t["Budget"])}</strong>
+                  </div>
+                  <div>
+                    <small>Total expenses</small>
+                    <strong>{money(expenses)}</strong>
+                  </div>
+                </div>
+                <Button variant="outline" size="sm" asChild>
+                  <Link to="/trips/$tripId" params={{ tripId: String(t["TripID"]) }}>
+                    View Trip Summary <ArrowUpRight />
+                  </Link>
+                </Button>
+              </div>
+            </article>
+          );
+        })}
+      </div>
+      {!trips.length && <Empty />}
+    </>
+  );
+}
 export function ItineraryPage() {
   const { db, search } = useTravel();
   const [form, setForm] = useState<Row | null | undefined>();
@@ -632,14 +713,20 @@ const columnLabels: Record<string, string> = {
   AccommodationID2: "ID",
 };
 export function ManagementPage({ entity }: { entity: Entity }) {
-  const { db, search } = useTravel();
+  const { db, search, user } = useTravel();
   const [form, setForm] = useState<Row | null | undefined>();
   const [filter, setFilter] = useState("all");
   const [categoryForm, setCategoryForm] = useState<Row | null | undefined>();
   const [receipt, setReceipt] = useState<Row | null>(null);
   const config = headings[entity];
-  const cols = [ids[entity], ...fields[entity]];
+  // Bookings belong to the logged-in traveler only; the Traveler column is
+  // hidden because the traveler already knows who they are. Replace this
+  // filter with an API call scoped by the authenticated TravelerID later.
+  const cols = [ids[entity], ...fields[entity]].filter(
+    (c) => !(entity === "BOOKING" && c === "TravelerID"),
+  );
   const rows = db[entity].filter((r) => {
+    if (entity === "BOOKING" && r["TravelerID"] !== user["TravelerID"]) return false;
     let text = JSON.stringify(r);
     if (r["TripID"]) text += db.TRIP.find((t) => t["TripID"] === r["TripID"])?.["Title"];
     if (r["TravelerID"])
@@ -720,7 +807,11 @@ export function ManagementPage({ entity }: { entity: Entity }) {
         title={config?.title || entity}
         description={config?.description || ""}
         action={
-          <Button onClick={() => setForm(null)}>
+          <Button
+            onClick={() =>
+              setForm(entity === "BOOKING" ? { TravelerID: Number(user["TravelerID"]) } : null)
+            }
+          >
             <Plus />
             {config?.add || "Add record"}
           </Button>
@@ -816,7 +907,11 @@ export function ManagementPage({ entity }: { entity: Entity }) {
         {!rows.length && <Empty />}
         <div className="table-bottom">
           <span>
-            {rows.length} of {db[entity].length} records
+            {rows.length} of{" "}
+            {entity === "BOOKING"
+              ? db.BOOKING.filter((b) => b["TravelerID"] === user["TravelerID"]).length
+              : db[entity].length}{" "}
+            records
           </span>
           <span>
             <Database size={14} />

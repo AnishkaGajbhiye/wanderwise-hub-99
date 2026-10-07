@@ -4,6 +4,7 @@ import {
   Plane,
   LayoutDashboard,
   Map,
+  History,
   Route,
   Ticket,
   MapPin,
@@ -26,6 +27,7 @@ import { LoginPage } from "./travel-pages";
 const nav = [
   { label: "Dashboard", path: "/", icon: LayoutDashboard },
   { label: "My Trips", path: "/trips", icon: Map },
+  { label: "Past Trips", path: "/past-trips", icon: History },
   { label: "Itinerary", path: "/itinerary", icon: Route },
   { label: "Bookings", path: "/bookings", icon: Ticket },
   { label: "Destinations", path: "/destinations", icon: MapPin },
