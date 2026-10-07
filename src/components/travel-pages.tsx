@@ -726,7 +726,11 @@ export function ManagementPage({ entity }: { entity: Entity }) {
         title={config?.title || entity}
         description={config?.description || ""}
         action={
-          <Button onClick={() => setForm(null)}>
+          <Button
+            onClick={() =>
+              setForm(entity === "BOOKING" ? { TravelerID: user["TravelerID"] } : null)
+            }
+          >
             <Plus />
             {config?.add || "Add record"}
           </Button>
